@@ -41,7 +41,7 @@ Once all the prompts are answered, an SVG file named logo.svg will be generated 
 Open logo.svg in a web browser to view the generated logo.
 
 Below is a video walkthrough demonstrating the usage and a test with all 3 shapes.
-(video here)
+https://www.youtube.com/watch?v=Ji7OuZwH6M8
 
 
 ## Dependencies

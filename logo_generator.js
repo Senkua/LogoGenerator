@@ -39,13 +39,70 @@ prompt([
   .then((answers) => {
     const { text, textColor, shape, shapeColor } = answers;
 
-    // Set the text attributes
+    // Set the initial font size for the text
+    let fontSize = 70;
+
+    // Set the scaling factor for the font size relative to the shape
+    const scalingFactor = 0.6;
+
+    // Set the scaling factor for the font size relative to the shape's width
+    const widthScalingFactor = 0.7;
+
+    // Set the scaling factor for the font size in the triangle shape
+    const triangleScalingFactor = 0.5;
+
+    // Set the maximum font size based on the shape's dimensions
+    let shapeWidth, shapeHeight;
+    switch (shape) {
+      case 'circle':
+        shapeWidth = shapeHeight = 100;
+        fontSize *= 1.2;
+        break;
+      case 'triangle':
+        shapeWidth = shapeHeight = 150;
+        fontSize *= triangleScalingFactor;
+        break;
+      case 'square':
+        shapeWidth = shapeHeight = 150;
+        fontSize *= 1.2;
+        break;
+      default:
+        console.log('Invalid shape. Exiting...');
+        return;
+    }
+
+    // Calculate the maximum font size that fits within the shape
+    while (fontSize > 0) {
+      const textElement = canvas
+        .text(text)
+        .fill(textColor)
+        .font({
+          family: 'Arial',
+          size: fontSize,
+          anchor: 'middle',
+          leading: '1.5em',
+          weight: 'bold',
+        });
+
+      const textBBox = textElement.bbox();
+
+      if (
+        textBBox.width <= shapeWidth * scalingFactor * widthScalingFactor &&
+        textBBox.height <= shapeHeight * scalingFactor
+      ) {
+        break;
+      }
+
+      fontSize--;
+    }
+
+    // Set the text attributes with the adjusted font size
     const textElement = canvas
       .text(text)
       .fill(textColor)
       .font({
         family: 'Arial',
-        size: 80,
+        size: fontSize,
         anchor: 'middle',
         leading: '1.5em',
         weight: 'bold',
@@ -55,25 +112,24 @@ prompt([
     let shapeElement;
     switch (shape) {
       case 'circle':
-        shapeElement = canvas.circle(100);
+        shapeElement = canvas.circle(shapeWidth);
         break;
       case 'triangle':
         shapeElement = canvas.polygon('150,30 75,170 225,170');
         break;
       case 'square':
-        shapeElement = canvas.rect(150, 150);
+        shapeElement = canvas.rect(shapeWidth, shapeHeight);
         break;
       default:
         console.log('Invalid shape. Exiting...');
         return;
     }
-    shapeElement.fill(shapeColor).stroke({ color: '#000', width: 3 });
 
-    // Get the center coordinates of the shape
+    shapeElement.fill(shapeColor).move(75, 20);
+
+    // Calculate the position to center the text within the shape
     const shapeCenterX = shapeElement.cx();
     const shapeCenterY = shapeElement.cy();
-
-    // Calculate the text position to center it within the shape
     const textBBox = textElement.bbox();
     const textX = shapeCenterX - textBBox.width / 2;
     const textY = shapeCenterY - textBBox.height / 2;
